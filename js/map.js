@@ -85,127 +85,15 @@ map.addControl(layerSwitcher);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Trying to add markers, will need to modify to use data file to CreatedData
-//http://bl.ocks.org/jsanz/1ebcb326e6cd2ff2eac0
-//http://openlayers.org/en/v3.1.1/examples/geojson.js
-
-var iconFeatures=[];
-
-var iconFeature = new ol.Feature({
-  geometry: new ol.geom.Point(ol.proj.transform([17.0341, 51.1912], 'EPSG:4326',     
-  'EPSG:3857')),
-  name: 'Null Island',
-  population: 4000,
-  rainfall: 500
-});
-
-var iconFeature1 = new ol.Feature({
-  geometry: new ol.geom.Point(ol.proj.transform([17.0336, 51.1910], 'EPSG:4326',     
-  'EPSG:3857')),
-  name: 'Null Island Two',
-  population: 4001,
-  rainfall: 501
-});
-
-iconFeatures.push(iconFeature);
-iconFeatures.push(iconFeature1);
-
-var vectorSource = new ol.source.Vector({
-  features: iconFeatures //add an array of features
-});
-
-var iconStyle = new ol.style.Style({
-  image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-    anchor: [0.5, 46],
-    anchorXUnits: 'fraction',
-    anchorYUnits: 'pixels',
-    opacity: 0.75,
-    src: 'img/green.png'
-  }))
-});
-
-
-var vectorLayer = new ol.layer.Vector({
-  source: vectorSource,
-  style: iconStyle
-});
-
-map.addLayer(vectorLayer);
-
-
-///////////////////////////////////////////////////////////////////////////////
-//Add polygen
-
-var styles = [
-  /* We are using two different styles for the polygons:
-   *  - The first style is for the polygons themselves.
-   *  - The second style is to draw the vertices of the polygons.
-   *    In a custom `geometry` function the vertices of a polygon are
-   *    returned as `MultiPoint` geometry, which will be used to render
-   *    the style.
-   */
-  new ol.style.Style({
-    stroke: new ol.style.Stroke({
-      color: 'blue',
-      width: 3
-    }),
-    fill: new ol.style.Fill({
-      color: 'rgba(0, 0, 255, 0.1)'
-    })
-  }),
-  new ol.style.Style({
-    image: new ol.style.Circle({
-      radius: 5,
-      fill: new ol.style.Fill({
-        color: 'orange'
-      })
-    }),
-    geometry: function(feature) {
-      // return the coordinates of the first ring of the polygon
-      var coordinates = feature.getGeometry().getCoordinates()[0];
-      return new ol.geom.MultiPoint(coordinates);
-    }
+// assume features.json is a FeatureCollection in EPSG:4326
+var vector = new ol.layer.Vector({
+  source: new ol.source.GeoJSON({
+    projection : 'EPSG:900913',
+    url: 'js/geoJson.json'
   })
-];
-
-
-var source = new ol.source.GeoJSON(/** @type {olx.source.GeoJSONOptions} */ ({
-  object: {
-    'type': 'FeatureCollection',
-    'crs': {
-      'type': 'name',
-      'properties': {
-        'name': 'EPSG:4326'
-      }
-    },
-    'features': [
-      {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [[[1896155.41448, 6655180.73139], [1896193.94227, 6655155.20719], [1896185.81033, 6655142.44515],
-              [1896149.41448, 6655166.96927], [1896155.41448, 6655180.73139]]]
-        }
-      },
-
-      {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Polygon',
-          'coordinates': [[[ 51.1909, 17.0337], [17.0336, 51.1909],
-              [17.0333, 51.1911], [17.0333, 51.1910], [17.0337, 51.1909]]]
-        }
-      }
-    ]
-  }
-}));
-
-var layer = new ol.layer.Vector({
-  source: source,
-  style: styles
 });
-	
-map.addLayer(layer);	
+
+map.addLayer(vector);
 
 //////////////////////////////////////////////////////////////////////////////
 //Popup
