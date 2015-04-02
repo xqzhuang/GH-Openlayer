@@ -10,8 +10,49 @@ var mousePositionControl = new ol.control.MousePosition({
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //Map initialazation
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
+//TODO: Here we can define list of position
+var gh = ol.proj.transform([17.0337, 51.1908], 'EPSG:4326', 'EPSG:3857');
+
+var ghView = new ol.View({
+		center: gh, //Location of Green House
+		zoom: 19});
+
+//TODO: Here allows you to add more default layers
+var layerWater = new ol.layer.Tile({
+			title: 'Water color',
+			name: 'water',
+			type: 'base',
+			visible: false,
+			source: new ol.source.Stamen({
+				layer: 'watercolor'
+			})
+		});
+		
+var layerOSM = new ol.layer.Tile({
+			title: 'OSM',
+			name: 'OSM',
+			type: 'base',
+			visible: true,
+			source: new ol.source.OSM()
+		});		
+		
+var layerUMP = new ol.layer.Tile({
+			title: 'UMP',
+			name: 'UMP',
+			type: 'base',
+			visible: false,
+			source: new ol.source.OSM({
+			url:'http://1.tiles.ump.waw.pl/ump_tiles/${z}/${x}/${y}.png'})
+		});
+		
+var defLayers = [layerWater, layerOSM, layerUMP];
+
+		
 var map = new ol.Map({
   //shift + drag to zoom in and rotate, so cool!
   interactions: ol.interaction.defaults().extend([
@@ -24,47 +65,18 @@ var map = new ol.Map({
     })
   }).extend([mousePositionControl]),
   
-
-	layers: [
-		new ol.layer.Tile({
-			title: 'Water color',
-			type: 'base',
-			visible: false,
-			source: new ol.source.Stamen({
-				layer: 'watercolor'
-			})
-		}),
-		
-		new ol.layer.Tile({
-			title: 'OSM',
-			type: 'base',
-			visible: true,
-			source: new ol.source.OSM()
-		}),
-		
-		new ol.layer.Tile({
-			title: 'UMP',
-			type: 'base',
-			visible: false,
-			source: new ol.source.OSM({
-			url:'http://1.tiles.ump.waw.pl/ump_tiles/${z}/${x}/${y}.png'})
-		})
-	],
-
-  
-	  target: 'map',
-	  
-	  view: new ol.View({
-		center: ol.proj.transform([17.03392, 51.19099], 'EPSG:4326', 'EPSG:3857'), //Location of Green House
-		zoom: 19
-  })
+	layers: defLayers,
+	target: 'map',	  
+	view: ghView
 });
 
+map.getLayerGroup().set('name', 'Root');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+//
 //Below is for adding more controls in the map       
-     
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //Zoom
 var myZoom = new ol.control.Zoom();
 map.addControl(myZoom);
@@ -83,7 +95,12 @@ var layerSwitcher = new ol.control.LayerSwitcher({
 map.addControl(layerSwitcher);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-var styles = [
+//
+//Load nodes and room from geoJson data files
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+var roomStyle = [
   //Style for Polygon
   new ol.style.Style({
     stroke: new ol.style.Stroke({
@@ -92,33 +109,30 @@ var styles = [
     }),
     fill: new ol.style.Fill({
       color: 'rgba(0, 0, 255, 0.1)'
-    })
+    })	
   }),
-  
-  //Style for marker
-  new ol.style.Style({
-    image: new ol.style.Circle({
-      radius: 5,
-      fill: new ol.style.Fill({
-        color: '#4682B4'
-      })
-    })
-  })
 ];
 
+
 // Parse features from file
-var vector = new ol.layer.Vector({
+var roomVector = new ol.layer.Vector({
   source: new ol.source.GeoJSON({
-    projection : 'EPSG:900913',
-    url: 'js/geoJson.json'
+    projection : map.getView().getProjection(),
+    url: 'js/room.json'
   }),
-  style: styles
+  name: 'room',
+  style: roomStyle
 });
 
-map.addLayer(vector);
+map.addLayer(roomVector);
 
-//////////////////////////////////////////////////////////////////////////////
-//Popup
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//Popup and click event
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 //Use this great popup API
 var popup = new ol.Overlay.Popup();
 map.addOverlay(popup);
@@ -143,13 +157,27 @@ map.on('click', function(evt) {
 		
 		popup.show(coord, '<div><h2>Coordinates</h2><p>' + prettyCoord + '</p></div>');		//TODO: here to put the information of the node in the popup
 	} else if(geometry.getType() == 'Polygon') {
+
+				
+		//Rotate the map if we choose one specific room
+	    var currentRotation = ghView.getRotation();
+		ghView.rotate(currentRotation + 0.9656183665104893, gh); //TODO: need to figure out another approach to caculate rotation
+		//change zoom level
+		ghView.setZoom(20);
 		
+						
 		//TODO: After clicking Polygon, it will show a popup which links to the specific room
-		var coord = geometry.getFirstCoordinate();		
-		popup.show(coord, '<a href="#">This is a polygon</a>');		//TODO: here to put the information of the node in the popup	
-	}	
-  } 
+		//var coord = geometry.getFirstCoordinate();		
+		//popup.show(coord, '<a href="#">This is a polygon.</a> Rotation is' );		//TODO: here to put the information of the node in the popup	
+		
+		//imageLayer.setVisible(true);
+		        
+	} 
+  } else {
+	    //imageLayer.setVisible(false);
+  }
 });
+
 
 // change mouse cursor when over marker
 $(map.getViewport()).on('mousemove', function(evt) {
@@ -166,9 +194,14 @@ $(map.getViewport()).on('mousemove', function(evt) {
   }     
 });
 
-///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 //trying to use interaction, seems easy
+//Mark it now, cause I didn't figure out how to seperate node and room so far.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // Interaction working on "pointermove"
+
 var selectPointerMove = new ol.interaction.Select({
   condition: ol.events.condition.pointerMove
 });
@@ -176,14 +209,14 @@ var selectPointerMove = new ol.interaction.Select({
 var changeInteraction = function() {
   if (selectPointerMove !== null) {
     map.removeInteraction(selectPointerMove);
-
-  }
-  
+  }  
   	map.addInteraction(selectPointerMove);
 };
 
 //Fire interaction
 changeInteraction();
+
+
 
 
 	

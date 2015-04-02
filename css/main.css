@@ -1,4 +1,36 @@
 
+/************************************************/
+/* Dropdown menu on hover */
+@media only screen and (min-width:769px) {
+	.dropdown:hover .dropdown-menu {
+		display: block;
+	}
+	.dropdown-submenu {
+		position: relative !important;
+	}
+
+	.dropdown-submenu>.dropdown-menu {
+		top: 0 !important;
+		left: 100% !important;
+		margin-top: -6px !important;
+		margin-left: -1px !important;
+		border-radius: 0 !important;
+	}
+
+	.dropdown-submenu:hover>.dropdown-menu {
+		display: block !important;
+	}
+
+	.dropdown-submenu>a:after {
+		display: block;
+		content: "\f105";
+		font-family: 'FontAwesome';
+		margin-top: -18px;
+		right: 15px;
+		position: absolute;
+		font-weight: 300;
+	}
+}
 
 
 .centered {
@@ -98,8 +130,6 @@
 .sensor-info{
   color: #4cad70;
 }
-
-
 
 
  /*Remove table border*/

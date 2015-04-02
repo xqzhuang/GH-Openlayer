@@ -7,6 +7,8 @@
 
 	<!-- Optional theme -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+	
+	<!--OpenLayer 3-->
 	<link rel="stylesheet" href="http://openlayers.org/en/v3.3.0/css/ol.css" type="text/css">
 	
 	<!--Layer switcher-->
@@ -16,7 +18,7 @@
 	<link rel="stylesheet" href="css/ol3-popup.css" type="text/css">
 	
 	<!-- Local style file -->
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/main.css">
 	
 	<!-- Openlayer and UMP -->
 	<script type="text/javascript" src="http://openlayers.org/en/v3.3.0/build/ol.js" ></script>
@@ -29,8 +31,6 @@
 
 	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-		
-
   </head>
   <body>
   
@@ -51,10 +51,12 @@
 		    <li class="active"><a href="index.html">Home</a></li>
 			<li class="dropdown">
 			  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Switch<span class="caret"></span></a>
-			  <ul class="dropdown-menu" role="menu">
-				<li><a href="#">Map</a></li>
-				<li><a href="#">Green House</a></li>
-				<li><a href="#">Room 1</a></li>
+			  <ul class="dropdown-menu" role="menu" id="switchBg">
+				<li><a href="#" id="mapMenu">Map</a></li>
+				<li><a href="#" id="gh">Green House</a></li>
+				<li><a href="#" id="room1">Room B5</a></li>
+				<li><a href="#" id="room2">Room B6</a></li>
+				<li><a href="#" id="room3">Room B7</a></li>
 			  </ul>
 			</li>
 			<li><a href="nodes.html">Nodes</a></li>
@@ -124,7 +126,7 @@
 							  </tr>
 							  
 							  <tr>
-								<td  valign="middle">Right</td> 
+								<td  valign="middle">Height</td> 
 								<td><input type="text" class="form-control txt-right" value="2.4m" disabled></td>
 							  </tr>	
 
@@ -260,15 +262,18 @@
 	</div><!-- /.modal -->
 	
 	
-	<!-- Local JavaScript files-->
-	<script src="js/script.js"></script>
+
 	<!--Layer switcher API-->
 	<script src="js/ol3-layerswitcher.js"></script>
 	<!-- Popup API -->
 	<script src="js/ol3-popup.js"></script>
 	<!--From ol3-->
 	<script src="js/example-behaviour.js" type="text/javascript"></script>
+	<!-- Local JavaScript files-->
+	<script src="js/main.js"></script>
 	<script src="js/map.js"></script>
+	<script src="js/nodes.js"></script>
+	<script src="js/layer-ctrl.js"></script>
 
 	
   </body>
